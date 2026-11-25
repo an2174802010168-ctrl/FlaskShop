@@ -19,3 +19,10 @@ numpy>=1.26
 requests>=2.31
 markdown-it-py>=3.0
 wordllama==0.4.0.post1
+
+gunicorn==21.2.0
+psycopg2-binary==2.9.9
+numpy>=1.26
+requests>=2.31
+markdown-it-py>=3.0
+wordllama==0.4.0.post1
