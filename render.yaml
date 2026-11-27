@@ -7,7 +7,7 @@ services:
     name: flaskshop
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt && flask seed
+    buildCommand: pip install -r requirements.txt && flask seed && flask create-admin --email "$ADMIN_EMAIL" --username "$ADMIN_USERNAME" --password "$ADMIN_PASSWORD"
     startCommand: gunicorn shop:app
     envVars:
       - key: PYTHON_VERSION
