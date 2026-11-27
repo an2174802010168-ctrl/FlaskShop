@@ -90,16 +90,23 @@ def is_safe_url(target):
         and not target.startswith('//')
 
 
+MIMETYPES = {'.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+             '.webp': 'image/webp', '.gif': 'image/gif'}
+
+
 def save_image(file_storage):
+    """Lưu ảnh vào CSDL (không ghi ra đĩa) và trả về tên ảnh để lưu ở Product.image."""
+    from app.models import StoredImage
     ext = os.path.splitext(secure_filename(file_storage.filename))[1].lower()
     name = f'{uuid.uuid4().hex}{ext}'
-    file_storage.save(os.path.join(current_app.config['UPLOAD_FOLDER'], name))
+    db.session.add(StoredImage(name=name, mimetype=MIMETYPES.get(ext, 'application/octet-stream'),
+                               data=file_storage.read()))
     return name
 
 
 def delete_image(name):
     if name:
-        try:
-            os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], name))
-        except OSError:
-            pass
+        from app.models import StoredImage
+        img = db.session.get(StoredImage, name)
+        if img:
+            db.session.delete(img)
