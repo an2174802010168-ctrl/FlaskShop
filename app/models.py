@@ -53,7 +53,14 @@ class Category(db.Model):
     def __repr__(self):
         return f'<Category {self.name}>'
 
+class StoredImage(db.Model):
+    """Ảnh sản phẩm lưu trong CSDL (đĩa của Render gói free bị xóa khi khởi động lại)."""
+    __tablename__ = 'stored_images'
 
+    name: so.Mapped[str] = so.mapped_column(sa.String(120), primary_key=True)
+    mimetype: so.Mapped[str] = so.mapped_column(sa.String(50))
+    data: so.Mapped[bytes] = so.mapped_column(sa.LargeBinary)
+    
 class Product(db.Model):
     __tablename__ = 'products'
 
