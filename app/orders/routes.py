@@ -9,6 +9,18 @@ from app.orders.forms import CheckoutForm
 from app.utils import cart_lines, shipping_fee
 from app.email import send_order_confirmation
 
+import threading
+
+def _send_async(app, order_id):
+    with app.app_context():
+        order = db.session.get(Order, order_id)
+        if order:
+            send_order_confirmation(order)
+
+# thay dòng send_order_confirmation(order) bằng:
+threading.Thread(target=_send_async,
+                 args=(current_app._get_current_object(), order.id),
+                 daemon=True).start()
 
 @bp.route('/checkout', methods=['GET', 'POST'])
 @login_required
