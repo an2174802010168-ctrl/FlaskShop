@@ -1,10 +1,9 @@
 import sqlalchemy as sa
-from flask import render_template, request, current_app, abort
 from flask_login import current_user
-
+from flask import render_template, request, current_app, abort, Response
 from app import db
 from app.main import bp
-from app.models import Product, Category
+from app.models import Product, Category, StoredImage
 from app.services import get_usd_rate
 SORTS = {
     'new': (Product.id.desc(), 'Mới nhất'),
@@ -52,3 +51,11 @@ def product(id):
             .order_by(Product.id.desc()).limit(4)).all()
     return render_template('product.html', product=product, related=related,
                            usd_rate=get_usd_rate())
+
+@bp.route('/img/<name>')
+def uploaded_image(name):
+    img = db.session.get(StoredImage, name)
+    if img is None:
+        abort(404)
+    return Response(img.data, mimetype=img.mimetype,
+                    headers={'Cache-Control': 'public, max-age=31536000, immutable'})
