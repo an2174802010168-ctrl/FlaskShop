@@ -11,16 +11,13 @@ from app.email import send_order_confirmation
 
 import threading
 
+
 def _send_async(app, order_id):
     with app.app_context():
         order = db.session.get(Order, order_id)
         if order:
             send_order_confirmation(order)
 
-# thay dòng send_order_confirmation(order) bằng:
-threading.Thread(target=_send_async,
-                 args=(current_app._get_current_object(), order.id),
-                 daemon=True).start()
 
 @bp.route('/checkout', methods=['GET', 'POST'])
 @login_required
@@ -59,7 +56,9 @@ def checkout():
                                          price=line.product.price, quantity=line.quantity))
         db.session.commit()
         session.pop('cart', None)
-        send_order_confirmation(order)
+        threading.Thread(target=_send_async,
+                         args=(current_app._get_current_object(), order.id),
+                         daemon=True).start()
         flash(f'Đặt hàng thành công! Mã đơn của bạn là #{order.id}.', 'success')
         return redirect(url_for('orders.detail', id=order.id))
 
