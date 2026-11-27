@@ -84,7 +84,7 @@ class Product(db.Model):
     @property
     def image_url(self):
         if self.image:
-            return url_for('static', filename='uploads/' + self.image)
+            return url_for('main.uploaded_image', name=self.image)
         return None
 
     def __repr__(self):
